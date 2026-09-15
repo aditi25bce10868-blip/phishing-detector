@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Phishing Guard",
+  "version": "1.0.0",
+  "description": "A browser-based phishing detection prototype",
+
+  "permissions": [
+    "tabs"
+  ],
+
+  "host_permissions": [
+    "<all_urls>"
+  ],
+
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Phishing Guard"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}

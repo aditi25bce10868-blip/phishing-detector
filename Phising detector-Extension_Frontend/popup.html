@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Phishing Guard</title>
+
+    <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>🛡️ Phishing Guard</h1>
+
+        <p class="subtitle">
+            Website Security Check
+        </p>
+
+
+        <!-- Risk Status -->
+        <div class="status-box">
+
+            <div id="statusIcon" class="status-icon">
+                🟢
+            </div>
+
+            <div>
+
+                <h2 id="riskLevel">
+                    ANALYZING
+                </h2>
+
+                <p id="riskMessage">
+                    Checking webpage...
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- Website -->
+        <div class="website">
+
+            <strong>Website:</strong>
+
+            <span id="website">
+                Not detected
+            </span>
+
+        </div>
+
+
+        <!-- Features -->
+        <div class="features">
+
+            <div class="feature">
+                <span>HTTPS</span>
+                <span id="https">-</span>
+            </div>
+
+            <div class="feature">
+                <span>Forms</span>
+                <span id="forms">0</span>
+            </div>
+
+            <div class="feature">
+                <span>Password Fields</span>
+                <span id="passwords">0</span>
+            </div>
+
+            <div class="feature">
+                <span>Links</span>
+                <span id="links">0</span>
+            </div>
+
+            <div class="feature">
+                <span>Iframes</span>
+                <span id="iframes">0</span>
+            </div>
+
+        </div>
+
+
+        <!-- Risk Score -->
+        <div class="score">
+
+            <p>
+                Risk Score
+            </p>
+
+            <strong id="riskScore">
+                0/100
+            </strong>
+
+        </div>
+
+
+        <!-- Warning -->
+        <div id="warning" class="warning">
+            ⚠️ Suspicious characteristics detected.
+        </div>
+
+
+    </div>
+
+
+    <script src="popup.js"></script>
+
+</body>
+
+</html>
