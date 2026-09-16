@@ -1,47 +1,30 @@
-// Get the currently active browser tab
 chrome.tabs.query(
     { active: true, currentWindow: true },
     function (tabs) {
-
-        // Make sure a tab exists
         if (!tabs || tabs.length === 0) {
             return;
         }
 
         const tab = tabs[0];
 
-        // Display the current URL
         document.getElementById("website").textContent =
             tab.url || "Unknown";
 
-
-        // Ask content.js for webpage information
         chrome.tabs.sendMessage(
             tab.id,
             {},
             function (response) {
-
-                // Content script may not work on Chrome internal pages
                 if (chrome.runtime.lastError) {
-
                     console.log(
                         "Content script unavailable:",
                         chrome.runtime.lastError.message
                     );
-
                     return;
                 }
 
-
-                // No response
                 if (!response) {
                     return;
                 }
-
-
-                // -----------------------------
-                // DISPLAY WEBPAGE FEATURES
-                // -----------------------------
 
                 document.getElementById("https").textContent =
                     response.https ? "✓" : "✗";
@@ -58,60 +41,56 @@ chrome.tabs.query(
                 document.getElementById("iframes").textContent =
                     response.iframes;
 
-
-                // -----------------------------
-                // CALCULATE PROTOTYPE RISK SCORE
-                // -----------------------------
+                const m3 = response.m3 || {};
+                const behavior = m3.behavior || {};
+                const dynamic = m3.dynamic || {};
+                const forms = m3.forms || [];
 
                 let riskScore = 0;
 
-
-                // Rule 1: HTTP instead of HTTPS
                 if (!response.https) {
                     riskScore += 30;
                 }
 
-
-                // Rule 2: Password field
                 if (response.passwordFields > 0) {
                     riskScore += 10;
                 }
 
-
-                // Rule 3: Suspicious URL
-                const url = response.url.toLowerCase();
-
-                if (
-                    url.includes("login") ||
-                    url.includes("verify") ||
-                    url.includes("secure") ||
-                    url.includes("account") ||
-                    url.includes("update")
-                ) {
-                    riskScore += 30;
-                }
-
-
-                // Rule 4: Suspicious form destination
                 if (response.suspiciousForm) {
                     riskScore += 30;
                 }
 
-
-                // Maximum score = 100
-                if (riskScore > 100) {
-                    riskScore = 100;
+                if (behavior.crossOriginSubmission) {
+                    riskScore += 15;
                 }
 
+                if (dynamic.dynamicFormDetected) {
+                    riskScore += 10;
+                }
 
-                // Display score
+                if (dynamic.dynamicPasswordFieldDetected) {
+                    riskScore += 10;
+                }
+
+                if (behavior.passwordFieldInteracted) {
+                    riskScore += 5;
+                }
+
+                if (
+                    behavior.formSubmitted &&
+                    behavior.crossOriginSubmission
+                ) {
+                    riskScore += 10;
+                }
+
+                if (forms.some((form) => form.crossOrigin)) {
+                    riskScore += 10;
+                }
+
+                riskScore = Math.min(riskScore, 100);
+
                 document.getElementById("riskScore").textContent =
                     riskScore + "/100";
-
-
-                // -----------------------------
-                // CLASSIFY RISK
-                // -----------------------------
 
                 const riskLevel =
                     document.getElementById("riskLevel");
@@ -125,42 +104,35 @@ chrome.tabs.query(
                 const warning =
                     document.getElementById("warning");
 
-
                 if (riskScore <= 30) {
-
                     riskLevel.textContent = "LOW RISK";
                     statusIcon.textContent = "🟢";
-
                     riskMessage.textContent =
                         "No major suspicious signals detected.";
-
                     warning.style.display = "none";
-
-                }
-
-                else if (riskScore <= 60) {
-
+                } else if (riskScore <= 60) {
                     riskLevel.textContent = "MEDIUM RISK";
                     statusIcon.textContent = "🟡";
-
                     riskMessage.textContent =
                         "Some suspicious characteristics detected.";
-
                     warning.style.display = "block";
-
-                }
-
-                else {
-
+                } else {
                     riskLevel.textContent = "HIGH RISK";
                     statusIcon.textContent = "🔴";
-
                     riskMessage.textContent =
                         "Multiple suspicious characteristics detected.";
-
                     warning.style.display = "block";
                 }
 
+                console.log("M3 DOM features:", m3.dom);
+                console.log(
+                    "M3 behavior features:",
+                    behavior
+                );
+                console.log(
+                    "M3 dynamic features:",
+                    dynamic
+                );
             }
         );
     }
