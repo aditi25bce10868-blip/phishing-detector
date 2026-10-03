@@ -21,15 +21,19 @@ const domFeatures = {
 
 function analyzeDOM() {
     const forms = document.querySelectorAll("form");
+
     const passwordFields = document.querySelectorAll(
         'input[type="password"]'
     );
+
     const emailFields = document.querySelectorAll(
         'input[type="email"]'
     );
+
     const hiddenFields = document.querySelectorAll(
         'input[type="hidden"]'
     );
+
     const iframes = document.querySelectorAll("iframe");
     const scripts = document.querySelectorAll("script");
     const links = document.querySelectorAll("a");
@@ -139,6 +143,15 @@ document.addEventListener("focusin", (event) => {
         element.type === "password"
     ) {
         behavioralFeatures.passwordFieldInteracted = true;
+
+        console.log(
+            "M3: User interacted with password field"
+        );
+
+        console.log(
+            "M3: Behavioral features:",
+            behavioralFeatures
+        );
     }
 });
 
@@ -160,6 +173,15 @@ document.addEventListener("focusin", (event) => {
         id.includes("login")
     ) {
         behavioralFeatures.usernameEmailFieldInteracted = true;
+
+        console.log(
+            "M3: User interacted with username/email field"
+        );
+
+        console.log(
+            "M3: Behavioral features:",
+            behavioralFeatures
+        );
     }
 });
 
@@ -172,8 +194,11 @@ document.addEventListener("submit", (event) => {
 
     behavioralFeatures.formSubmitted = true;
 
+    console.log("M3: Form submitted");
+
     try {
         const currentOrigin = window.location.origin;
+
         const formOrigin = new URL(
             form.action || window.location.href,
             window.location.href
@@ -181,10 +206,21 @@ document.addEventListener("submit", (event) => {
 
         if (currentOrigin !== formOrigin) {
             behavioralFeatures.crossOriginSubmission = true;
+
+            console.log(
+                "M3: Cross-origin form submission detected"
+            );
         }
     } catch (error) {
-        behavioralFeatures.crossOriginSubmission = false;
+        console.log(
+            "M3: Could not analyze submission destination"
+        );
     }
+
+    console.log(
+        "M3: Behavioral features:",
+        behavioralFeatures
+    );
 });
 
 function startMutationMonitoring() {
@@ -203,18 +239,33 @@ function startMutationMonitoring() {
 
                 const element = node;
 
+                console.log(
+                    "M3: DOM element added:",
+                    element.tagName
+                );
+
                 if (
                     element.matches &&
                     element.matches("form")
                 ) {
                     behavioralFeatures.dynamicFormDetected = true;
+
+                    console.log(
+                        "M3: Dynamic form detected after page load"
+                    );
                 }
 
                 if (
                     element.matches &&
-                    element.matches('input[type="password"]')
+                    element.matches(
+                        'input[type="password"]'
+                    )
                 ) {
                     behavioralFeatures.dynamicPasswordFieldDetected = true;
+
+                    console.log(
+                        "M3: Dynamic password field detected after page load"
+                    );
                 }
 
                 if (
@@ -222,6 +273,10 @@ function startMutationMonitoring() {
                     element.querySelector("form")
                 ) {
                     behavioralFeatures.dynamicFormDetected = true;
+
+                    console.log(
+                        "M3: Dynamic form detected inside added element"
+                    );
                 }
 
                 if (
@@ -231,6 +286,10 @@ function startMutationMonitoring() {
                     )
                 ) {
                     behavioralFeatures.dynamicPasswordFieldDetected = true;
+
+                    console.log(
+                        "M3: Dynamic password field detected inside added element"
+                    );
                 }
 
                 if (
@@ -252,6 +311,10 @@ function startMutationMonitoring() {
                         text.includes("continue")
                     ) {
                         behavioralFeatures.dynamicLoginElementDetected = true;
+
+                        console.log(
+                            "M3: Dynamic login element detected after page load"
+                        );
                     }
                 }
 
@@ -275,6 +338,10 @@ function startMutationMonitoring() {
                             text.includes("continue")
                         ) {
                             behavioralFeatures.dynamicLoginElementDetected = true;
+
+                            console.log(
+                                "M3: Dynamic login element detected inside added element"
+                            );
                         }
                     });
                 }
@@ -286,7 +353,13 @@ function startMutationMonitoring() {
         childList: true,
         subtree: true
     });
+
+    console.log("M3: MutationObserver started");
 }
+
+console.log(
+    "M3: DOM and behavioral analysis loaded"
+);
 
 if (document.body) {
     startMutationMonitoring();
@@ -312,6 +385,11 @@ chrome.runtime.onMessage.addListener(
             suspiciousForm: detectSuspiciousForms(),
             m3: m3Features
         };
+
+        console.log(
+            "M1: Sending M1 + M3 features to popup",
+            features
+        );
 
         sendResponse(features);
 
