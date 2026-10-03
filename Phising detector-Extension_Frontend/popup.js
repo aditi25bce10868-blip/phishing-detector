@@ -77,6 +77,12 @@ chrome.tabs.query(
                 }
 
                 if (
+                    behavior.usernameEmailFieldInteracted
+                ) {
+                    riskScore += 5;
+                }
+
+                if (
                     behavior.formSubmitted &&
                     behavior.crossOriginSubmission
                 ) {
@@ -124,13 +130,18 @@ chrome.tabs.query(
                     warning.style.display = "block";
                 }
 
-                console.log("M3 DOM features:", m3.dom);
                 console.log(
-                    "M3 behavior features:",
+                    "DOM features:",
+                    m3.dom
+                );
+
+                console.log(
+                    "Behavior features:",
                     behavior
                 );
+
                 console.log(
-                    "M3 dynamic features:",
+                    "Dynamic features:",
                     dynamic
                 );
             }
